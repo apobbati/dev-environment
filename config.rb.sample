@@ -1,20 +1,17 @@
 
-# To automatically replace the discovery token on 'vagrant up', uncomment
-# the lines below:
-#
-#if File.exists?('user-data') && ARGV[0].eql?('up')
-#  require 'open-uri'
-#  require 'yaml'
-# 
-#  token = open('https://discovery.etcd.io/new').read
-# 
-#  data = YAML.load(IO.readlines('user-data')[1..-1].join)
-#  data['coreos']['etcd']['discovery'] = token
-# 
-#  yaml = YAML.dump(data)
-#  File.open('user-data', 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
-#end
-#
+# This will automatically populate the etcd discovery token
+if File.exists?('user-data') && ARGV[0].eql?('up')
+  require 'open-uri'
+  require 'yaml'
+
+  token = open('https://discovery.etcd.io/new').read
+
+  data = YAML.load(IO.readlines('user-data')[1..-1].join)
+  data['coreos']['etcd']['discovery'] = token
+
+  yaml = YAML.dump(data)
+  File.open('user-data', 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
+end
 
 #
 # coreos-vagrant is configured through a series of configuration
@@ -46,3 +43,20 @@
 #$vb_gui = false
 #$vb_memory = 1024
 #$vb_cpus = 1
+
+# Generic settings
+
+# The network subnet
+#$ip_network = "172.66.8"
+
+# The starting IP
+#$ip_start = 100
+
+# The share directory on the host (Source)
+#$host_shared_path  = "./shared"
+
+# The shared directory on the guest (Destination)
+#$guest_shared_path = "/home/core/shared"
+
+# Whether to enable SSH forwarding
+#$forward_agent = true

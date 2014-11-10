@@ -2,3 +2,4 @@ shared/
 .vagrant/
 config.rb
 user-data
+*.vdi
