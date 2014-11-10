@@ -33,7 +33,7 @@ if File.exist?(CONFIG)
 end
 
 Vagrant.configure("2") do |config|
-	config.ssh.forward_agent = $forward_agent
+  config.ssh.forward_agent = $forward_agent
 
   config.vm.box = "coreos-%s" % $update_channel
   config.vm.box_version = ">= 308.0.1"
@@ -121,11 +121,11 @@ Vagrant.configure("2") do |config|
         # ]
       end
 
-			$ip_range = $ip_network + "." + ($ip_start + i).to_s
+      $ip_range = $ip_network + "." + ($ip_start + i).to_s
       config.vm.network :private_network, ip: $ip_range
 
-			config.vm.synced_folder $host_shared_path, $guest_shared_path, type: "rsync",
-				rsync__exclude: ".git/"
+      config.vm.synced_folder $host_shared_path, $guest_shared_path, type: "rsync",
+        rsync__exclude: ".git/"
 
       if File.exist?(CLOUD_CONFIG_PATH)
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
