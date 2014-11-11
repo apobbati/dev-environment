@@ -10,7 +10,7 @@ write_files:
 
 coreos:
   update:
-    reboot-strategy: best-effort
+    reboot-strategy: off
   etcd:
     # generate a new token for each unique cluster from https://discovery.etcd.io/new
     # WARNING: replace each time you 'vagrant destroy'
