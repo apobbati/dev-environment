@@ -18,7 +18,6 @@ $vb_cpus = 1
 $ip_network = "172.66.8"
 $ip_start = 100
 $host_shared_path  = "./shared"
-$guest_shared_path = "/home/core/shared"
 $forward_agent = true
 $ext_storage_size = 1024 * 20
 
@@ -56,7 +55,7 @@ Vagrant.configure("2") do |config|
   end
 
   (1..$num_instances).each do |i|
-    config.vm.define vm_name = "core-%02d" % i do |config|
+    config.vm.define vm_name = "core-%d" % i do |config|
       config.vm.hostname = vm_name
 
       if $enable_serial_logging
@@ -94,37 +93,36 @@ Vagrant.configure("2") do |config|
         vb.memory = $vb_memory
         vb.cpus = $vb_cpus
 
-        # TODO: Will enable this later after figuring out mounting /var/lib/docker
-        # $ext_storage = vm_name + ".vdi"
-        #
-        # unless File.exist?($ext_storage)
-        #   vb.customize [
-        #     'createhd',
-        #     '--filename', $ext_storage,
-        #     '--size', $ext_storage_size
-        #   ]
-        #   vb.customize [
-        #     'storagectl', :id,
-        #     '--add', 'sata',
-        #     '--name', 'SATA',
-        #     '--portcount', 2,
-        #     '--hostiocache', 'on'
-        #   ]
-        # end
-        # vb.customize [
-        #   'storageattach', :id,
-        #   '--storagectl', 'SATA',
-        #   '--port', 1,
-        #   '--device', 0,
-        #   '--type', 'hdd',
-        #   '--medium', $ext_storage
-        # ]
+        $ext_storage = vm_name + ".vdi"
+
+        unless File.exist?($ext_storage)
+          vb.customize [
+            'createhd',
+            '--filename', $ext_storage,
+            '--size', $ext_storage_size
+          ]
+          vb.customize [
+            'storagectl', :id,
+            '--add', 'sata',
+            '--name', 'SATA',
+            '--portcount', 2,
+            '--hostiocache', 'on'
+          ]
+        end
+        vb.customize [
+          'storageattach', :id,
+          '--storagectl', 'SATA',
+          '--port', 1,
+          '--device', 0,
+          '--type', 'hdd',
+          '--medium', $ext_storage
+        ]
       end
 
       $ip_range = $ip_network + "." + ($ip_start + i).to_s
       config.vm.network :private_network, ip: $ip_range
 
-      config.vm.synced_folder $host_shared_path, $guest_shared_path, type: "rsync",
+      config.vm.synced_folder $host_shared_path, "/home/core/shared", type: "rsync",
         rsync__exclude: ".git/"
 
       if File.exist?(CLOUD_CONFIG_PATH)

@@ -38,28 +38,24 @@ coreos:
 
         [Install]
         WantedBy=sockets.target
-
-# TODO: Need to work on VM upgrade process in order to avoid losing Docker containers
-# after upgrades to underlying base-box
-# - name: external-storage.service
-# 	command: start
-# 	content: |
-# 		[Unit]
-# 		Description=Creates the file-system on the external mount
-# 		[Service]
-# 		Type=oneshot
-# 		RemainAfterExit=yes
-#			After=sshd.service
-# 		ExecStart=if [ -f /home/core/.DO-NOT-DELETE ]; then :; else /usr/sbin/wipefs -f /dev/sda && /usr/sbin/mkfs.btrfs -f /dev/sda && touch /home/core/.DO-NOT-DELETE; fi
-# - name: var-lib-docker.mount
-# 	command: start
-# 	content: |
-# 		[Unit]
-# 		Description=Mount external storage to /var/lib/docker
-# 		Requires=external-storage.service
-# 		After=external-storage.service
-# 		Before=docker.service
-# 		[Mount]
-# 		What=/dev/sda
-# 		Where=/var/lib/docker
-# 		Type=btrfs
+    - name: external-storage.service
+    	command: start
+    	content: |
+    		[Unit]
+    		Description=Creates the file-system on the external mount
+    		[Service]
+    		Type=oneshot
+    		RemainAfterExit=yes
+    		ExecStart=/bin/bash -c '(/usr/sbin/blkid -t TYPE=btrfs | grep /dev/sda) || (/usr/sbin/wipefs -fa /dev/sda && /usr/sbin/mkfs.btrfs -f /dev/sda)'
+    - name: var-lib-docker.mount
+    	command: start
+    	content: |
+    		[Unit]
+    		Description=Mount external storage to /var/lib/docker
+    		Requires=external-storage.service
+    		After=external-storage.service
+    		Before=docker.service
+    		[Mount]
+    		What=/dev/sda
+    		Where=/var/lib/docker
+    		Type=btrfs
