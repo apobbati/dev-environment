@@ -43,6 +43,11 @@ if File.exist?(CONFIG)
   require CONFIG
 end
 
+if $num_instances > 1
+  raise 'At this time, we cant support more than one instance.
+  Change num_instances to 1.'
+end
+
 Vagrant.configure("2") do |config|
   config.ssh.forward_agent = $forward_agent
 
