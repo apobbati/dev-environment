@@ -21,6 +21,18 @@ $host_shared_path  = "./shared"
 $forward_agent = true
 $ext_storage_size = 1024 * 20
 
+# This will automatically populate the update group
+if File.exists?('user-data') && ARGV[0].eql?('up')
+  require 'open-uri'
+  require 'yaml'
+
+  data = YAML.load(IO.readlines('user-data')[1..-1].join)
+  data['coreos']['update']['group'] = $update_channel
+
+  yaml = YAML.dump(data)
+  File.open('user-data', 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
+end
+
 # Attempt to apply the deprecated environment variable NUM_INSTANCES to
 # $num_instances while allowing config.rb to override it
 if ENV["NUM_INSTANCES"].to_i > 0 && ENV["NUM_INSTANCES"]
