@@ -60,3 +60,6 @@ end
 
 # Whether to enable SSH forwarding
 #$forward_agent = true
+
+# The size of the external storage volume (in MiB)
+$ext_storage_size = 1024 * 20
