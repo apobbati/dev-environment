@@ -12,9 +12,6 @@ coreos:
   update:
     reboot-strategy: etcd-lock
   etcd:
-    # generate a new token for each unique cluster from https://discovery.etcd.io/new
-    # WARNING: replace each time you 'vagrant destroy'
-    #discovery: https://discovery.etcd.io/<token>
     addr: $public_ipv4:4001
     peer-addr: $public_ipv4:7001
   fleet:
@@ -80,18 +77,9 @@ coreos:
         Requires=network-online.target
 
         [Service]
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/apiserver
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/controller-manager
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/kubecfg
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/kubelet
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/proxy
-        ExecStart=/usr/bin/wget -N -P \
-          /opt/bin http://storage.googleapis.com/kubernetes/scheduler
+        ExecStart=/usr/bin/mkdir -p /opt/bin
+        ExecStart=/usr/bin/wget -N -P /opt/ https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.4.3/kubernetes.tar.gz
+        ExecStart=/usr/bin/tar -xf /opt/kubernetes.tar.gz -C /opt/bin --strip-components 4 --wildcards "kubernetes/platforms/linux/amd64/*"
         ExecStart=/usr/bin/chmod +x /opt/bin/apiserver
         ExecStart=/usr/bin/chmod +x /opt/bin/controller-manager
         ExecStart=/usr/bin/chmod +x /opt/bin/kubecfg
@@ -114,6 +102,7 @@ coreos:
           --address=127.0.0.1 \
           --port=8080 \
           --etcd_servers=http://127.0.0.1:4001 \
+          --machines=127.0.0.1 \
           --logtostderr=true
         Restart=on-failure
         RestartSec=1
