@@ -142,7 +142,6 @@ coreos:
         [Service]
         ExecStart=/opt/bin/controller-manager \
           --master=127.0.0.1:8080 \
-          --machines=127.0.0.1 \
           --logtostderr=true
         Restart=always
         RestartSec=5
